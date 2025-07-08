@@ -173,15 +173,26 @@ function App() {
 
   return (
     <div className="app">
-      <h1>AI VC</h1>
-      <div className="chat-header">Today</div>
+      <div className="header">
+        <h1>AI VC Assistant</h1>
+        <div className="subheader">India Biomaterials Market Intelligence</div>
+      </div>
       
-      <div className="chat-interface">
-        <div className="messages">
+      <div className="chat-container">
+        <div className="chat-window">
           {messages.map((msg, i) => (
             <div key={i} className={`message ${msg.role}`}>
+              <div className="message-header">
+                {msg.role === 'user' ? (
+                  <span className="user-badge">You</span>
+                ) : (
+                  <span className="assistant-badge">AI Assistant</span>
+                )}
+              </div>
               <div className="message-content">
-                {msg.role === 'user' ? msg.content : (
+                {msg.role === 'user' ? (
+                  msg.content
+                ) : (
                   <>
                     {msg.content.split('\n').map((line, idx) => (
                       <p key={idx}>{line}</p>
@@ -195,9 +206,9 @@ function App() {
             <div className="message assistant">
               <div className="message-content">
                 <div className="typing-indicator">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
                 </div>
               </div>
             </div>
@@ -205,17 +216,21 @@ function App() {
           <div ref={messagesEndRef} />
         </div>
         
-        <form onSubmit={handleSubmit} className="input-form">
+        <form onSubmit={handleSubmit} className="input-area">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            placeholder={isLoading ? "Waiting for response..." : "Type your message..."}
+            placeholder={isLoading ? "AI Assistant is thinking..." : "Type your message..."}
             autoFocus
           />
           <button type="submit" disabled={isLoading}>
-            {isLoading ? '...' : 'Send'}
+            {isLoading ? (
+              <span className="spinner"></span>
+            ) : (
+              <span>Send</span>
+            )}
           </button>
         </form>
       </div>

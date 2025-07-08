@@ -1,31 +1,248 @@
-/* Add to your App.css */
-.typing-indicator {
-  display: flex;
-  padding: 10px 0;
+/* Base Styles */
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #1e40af;
+  --accent-color: #3b82f6;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --bg-color: #f9fafb;
+  --card-bg: #ffffff;
+  --user-bubble: #e0e7ff;
+  --assistant-bubble: #f3f4f6;
 }
 
-.typing-indicator .dot {
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* App Layout */
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.subheader {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-top: 0.25rem;
+}
+
+/* Chat Container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.chat-window {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Messages */
+.message {
+  max-width: 85%;
+  width: fit-content;
+}
+
+.message.user {
+  margin-left: auto;
+}
+
+.message.assistant {
+  margin-right: auto;
+}
+
+.message-header {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.user-badge {
+  color: var(--primary-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.assistant-badge {
+  color: var(--text-light);
+}
+
+.message-content {
+  padding: 1rem;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.message.user .message-content {
+  background-color: var(--user-bubble);
+  color: var(--text-dark);
+  border-top-right-radius: 4px;
+}
+
+.message.assistant .message-content {
+  background-color: var(--assistant-bubble);
+  color: var(--text-dark);
+  border-top-left-radius: 4px;
+}
+
+.message-content p {
+  margin-bottom: 0.5rem;
+}
+
+.message-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Input Area */
+.input-area {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: var(--card-bg);
+}
+
+.input-area input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-area input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.input-area button {
+  margin-left: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.input-area button:hover {
+  background-color: var(--secondary-color);
+}
+
+.input-area button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator span {
   width: 8px;
   height: 8px;
   margin: 0 2px;
-  background-color: #666;
+  background-color: var(--text-light);
   border-radius: 50%;
-  opacity: 0;
-  animation: typingAnimation 1.4s infinite;
+  opacity: 0.4;
+  animation: typingAnimation 1.4s infinite ease-in-out;
 }
 
-.typing-indicator .dot:nth-child(1) {
+.typing-indicator span:nth-child(1) {
   animation-delay: 0s;
 }
-.typing-indicator .dot:nth-child(2) {
+.typing-indicator span:nth-child(2) {
   animation-delay: 0.2s;
 }
-.typing-indicator .dot:nth-child(3) {
+.typing-indicator span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
 @keyframes typingAnimation {
-  0% { opacity: 0; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-5px); }
-  100% { opacity: 0; transform: translateY(0); }
+  0% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
+  100% { opacity: 0.4; transform: translateY(0); }
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .app {
+    padding: 0.5rem;
+    height: 100vh;
+  }
+  
+  .chat-window {
+    padding: 1rem;
+  }
+  
+  .message {
+    max-width: 90%;
+  }
+  
+  .input-area {
+    padding: 0.75rem;
+  }
+  
+  .input-area button {
+    padding: 0.75rem 1rem;
+  }
 }
