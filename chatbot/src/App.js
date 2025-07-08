@@ -57,8 +57,7 @@ function App() {
     const welcomeMessages = [
       { role: 'assistant', content: "Hey There ● I'm your Intelligent AI Copilot for India's Biomaterials sector" },
       { role: 'assistant', content: "I'm loaded with the latest 2024 market data" },
-      { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
-      { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
+      { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" }
     ];
 
     // Initial 2 second delay
@@ -183,8 +182,7 @@ function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>AI VC Assistant</h1>
-        <div className="subheader">India Biomaterials Market Intelligence</div>
+        <h1>ChatBot</h1>
       </div>
       
       <div className="chat-container">
