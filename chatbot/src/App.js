@@ -400,15 +400,15 @@ function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>India Biomaterials AI Advisor</h1>
-        <p>Market Entry Guidance for Foreign Startups</p>
+        <h1>Chatbot</h1>
+        
       </div>
       
       <div className="chat-container">
         {isInitializing ? (
           <div className="initial-loading">
             <div className="loading-spinner"></div>
-            <p>Loading 2024 Biomaterials Market Data...</p>
+            <p>Loading...</p>
           </div>
         ) : (
           <>
@@ -449,7 +449,7 @@ function App() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isLoading}
-                placeholder={isLoading ? "Analyzing biomaterials data..." : "Ask about India's biomaterials market..."}
+                placeholder={isLoading ? "Analyzing biomaterials data..." : "Ask Questions..."}
                 autoFocus
               />
               <button type="submit" disabled={isLoading}>
