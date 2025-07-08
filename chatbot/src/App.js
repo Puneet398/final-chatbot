@@ -165,10 +165,8 @@ function App() {
   // Initial loading sequence
   useEffect(() => {
     const welcomeMessages = [
-      { role: 'assistant', content: "Namaste! I'm your AI Guide for India's Biomaterials Sector" },
-      { role: 'assistant', content: "I have comprehensive data on India's $5.74B biomaterials market (2024)" },
-      { role: 'assistant', content: "Let me help you navigate partnerships, policies, and market entry strategies" },
-      { role: 'assistant', content: "Type 'ready' when you want to begin exploring opportunities" }
+      { role: 'assistant', content: "Hi! I'm your AI Guide for India's Biomaterials Sector" },
+      { role: 'assistant', content: "Let me help you navigate partnerships, policies, and market entry strategies" }
     ];
 
     const timer = setTimeout(() => {
