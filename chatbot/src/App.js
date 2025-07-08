@@ -1,16 +1,60 @@
 import React, { useState, useEffect, useRef } from 'react';
-import pdfParse from 'pdf-parse';
 import './App.css';
 
 function App() {
+  // Embedded PDF content directly in the code
+  const pdfContent = {
+    marketSize: "$5.74 billion in 2024 (projected $20.49 billion by 2032)",
+    sectors: {
+      healthcare: `Healthcare Biomaterials Market:
+      - Current size: $2.84 billion (2022)
+      - Projected size: $9.44 billion (2030)
+      - CAGR: 16.20%
+      Key opportunities:
+      • Biodegradable medical devices
+      • Drug delivery systems
+      • Tissue engineering scaffolds`,
+      packaging: `Packaging Biomaterials:
+      - Market size: $388.9 million (2025)
+      - Projected size: $844.2 million (2032)
+      - CAGR: 11.7%
+      Key materials:
+      • Florafoam (flower waste)
+      • Bamboo biocomposites
+      • Starch-based films`,
+      agriculture: `Agricultural Applications:
+      - 990 million tonnes annual biomass
+      - 230 MMT surplus availability
+      Key uses:
+      • Bioplastics for mulch films
+      • Bio-based fertilizers
+      • Seed coatings`,
+      textiles: `Textile Biomaterials:
+      Innovations:
+      • Biomass-based fibers
+      • Bio-leather from agricultural waste
+      • PLA-based sustainable fashion`
+    },
+    partnerships: `Essential Partnerships:
+    1. Government: BIRAC, BioAngels platform
+    2. Research: IITs, IISc, CSIR labs
+    3. Industry: MYNUSCo, Phool.co`,
+    policies: `Government Support:
+    • BioE3 Policy Framework
+    • PLI Schemes
+    • National Biopharma Mission`
+  };
+
   const [messages, setMessages] = useState([
     { role: 'assistant', content: "Hey There ● I'm your Intelligent AI Copilot for India's Biomaterials sector" },
-    { role: 'assistant', content: "I'm analyzing the latest 2024 market data..." },
+    { role: 'assistant', content: "I'm loaded with the latest 2024 market data" },
+    { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
+    { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
   ]);
+  
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // Initial loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [conversationStage, setConversationStage] = useState(0);
-  const [pdfData, setPdfData] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Simulate LLM thinking with random delays
@@ -18,62 +62,6 @@ function App() {
     const delay = Math.random() * (max - min) + min;
     await new Promise(resolve => setTimeout(resolve, delay));
   };
-
-  // Load PDF data with loading states
-  useEffect(() => {
-    const loadPDF = async () => {
-      try {
-        setMessages(prev => [...prev, 
-          { role: 'assistant', content: "📄 Loading Sustainable PDF knowledge base..." }
-        ]);
-        
-        const response = await fetch('/Sustainable_PDF.pdf');
-        const arrayBuffer = await response.arrayBuffer();
-        
-        setMessages(prev => [...prev, 
-          { role: 'assistant', content: "🔍 Extracting key market insights..." }
-        ]);
-        await simulateThinking();
-        
-        const { text } = await pdfParse(new Uint8Array(arrayBuffer));
-        
-        setMessages(prev => [...prev, 
-          { role: 'assistant', content: "🧠 Processing sector-specific data..." }
-        ]);
-        await simulateThinking();
-        
-        // Extract structured data
-        const sectors = {
-          healthcare: extractSection(text, 'Healthcare and Biomedical Applications'),
-          packaging: extractSection(text, 'Packaging and Consumer Products'),
-          agriculture: extractSection(text, 'Agricultural Applications'),
-          textiles: extractSection(text, 'Textiles and Fashion')
-        };
-        
-        setPdfData({
-          marketSize: extractMetric(text, 'biomaterials market'),
-          sectors,
-          partnerships: extractSection(text, 'Essential Local Partnerships'),
-          policies: extractSection(text, 'Government Policy Framework')
-        });
-        
-        setMessages(prev => [...prev, 
-          { role: 'assistant', content: "✅ Knowledge base loaded successfully!" },
-          { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
-          { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
-        ]);
-        
-      } catch (error) {
-        setMessages(prev => [...prev, 
-          { role: 'assistant', content: "⚠️ Failed to load full knowledge base. Using basic mode." }
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadPDF();
-  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -110,10 +98,10 @@ function App() {
         await simulateThinking(1200, 2000);
         
         const sector = getSectorFromInput(input);
-        const sectorData = pdfData?.sectors[sector] || "";
+        const sectorData = pdfContent.sectors[sector] || "";
         
         response = { 
-          content: `Excellent choice! ${sectorData ? "Here's what I found:\n\n" + sectorData.substring(0, 500) + "..." : ""}\n\n` +
+          content: `Excellent choice! ${sectorData ? "Here's what I found:\n\n" + sectorData : ""}\n\n` +
                    "What stage is your venture at?\n" +
                    "• Pre-seed\n" +
                    "• Series A\n" +
@@ -126,7 +114,7 @@ function App() {
         await simulateThinking(1500, 2500);
         
         response = { 
-          content: generateRecommendations(input, pdfData)
+          content: generateRecommendations(input, pdfContent)
         };
         setConversationStage(3);
       }
@@ -134,7 +122,7 @@ function App() {
         // General Q&A mode with simulated thinking
         await simulateThinking(1000, 3000);
         
-        const relevantContent = extractRelevantContent(input, pdfData);
+        const relevantContent = extractRelevantContent(input, pdfContent);
         response = { 
           content: relevantContent || "Based on general market trends, I recommend..."
         };
@@ -152,19 +140,6 @@ function App() {
   };
 
   // Helper functions
-  const extractSection = (text, header) => {
-    const start = text.indexOf(header);
-    if (start === -1) return "";
-    const end = text.indexOf('=====', start);
-    return text.substring(start, end !== -1 ? end : text.length);
-  };
-
-  const extractMetric = (text, metric) => {
-    const regex = new RegExp(`${metric}.*?(\\$[\\d\\.]+\\s?[mb]illion)`, 'i');
-    const match = text.match(regex);
-    return match ? match[1] : "";
-  };
-
   const getSectorFromInput = (input) => {
     if (/health|medical/i.test(input)) return 'healthcare';
     if (/packag|consumer/i.test(input)) return 'packaging';
@@ -174,29 +149,25 @@ function App() {
   };
 
   const generateRecommendations = (stage, data) => {
-    // Simulate complex analysis
-    const partnerships = data?.partnerships ? data.partnerships.substring(0, 800) : "";
-    const policies = data?.policies ? data.policies.substring(0, 600) : "";
-    
     return `For ${stage} ventures, here's your strategic roadmap:\n\n` +
-           `1. ESSENTIAL PARTNERSHIPS:\n${partnerships || "Government and research institutions"}\n\n` +
-           `2. POLICY SUPPORT:\n${policies || "BioE3 framework and PLI schemes"}\n\n` +
-           `3. NEXT STEPS:\n- Connect with BIRAC\n- Validate technology with IITs/IISc\n- Engage regulatory consultants`;
+           `1. ESSENTIAL PARTNERSHIPS:\n${data.partnerships}\n\n` +
+           `2. POLICY SUPPORT:\n${data.policies}\n\n` +
+           `3. NEXT STEPS:\n- Connect with BIRAC\n- Validate technology\n- Engage consultants`;
   };
 
   const extractRelevantContent = (query, data) => {
-    if (!data) return null;
-    // Simple keyword search across all sections
     const keywords = query.toLowerCase().split(/\s+/);
-    const allText = JSON.stringify(data).toLowerCase();
+    let relevantInfo = [];
     
-    return keywords.some(kw => allText.includes(kw))
-      ? "From our analysis:\n\n" + 
-        Object.entries(data).map(([key, value]) => 
-          typeof value === 'string' && value.toLowerCase().includes(keywords[0])
-            ? `${key}:\n${value.substring(0, 300)}...\n`
-            : ""
-        ).join('')
+    // Search across all content sections
+    Object.entries(data.sectors).forEach(([sector, content]) => {
+      if (keywords.some(kw => content.toLowerCase().includes(kw))) {
+        relevantInfo.push(`${sector.toUpperCase()}:\n${content}`);
+      }
+    });
+    
+    return relevantInfo.length > 0 
+      ? "From our analysis:\n\n" + relevantInfo.join('\n\n') 
       : null;
   };
 
