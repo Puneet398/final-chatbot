@@ -45,12 +45,34 @@ function App() {
     • National Biopharma Mission`
   };
 
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hey There ● I'm your Intelligent AI Copilot for India's Biomaterials sector" },
-    { role: 'assistant', content: "I'm loaded with the latest 2024 market data" },
-    { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
-    { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
-  ]);
+ useEffect(() => {
+    const welcomeMessages = [
+      { role: 'assistant', content: "Hey There ● I'm your Intelligent AI Copilot for India's Biomaterials sector" },
+      { role: 'assistant', content: "I'm loaded with the latest 2024 market data" },
+      { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
+      { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
+    ];
+
+    // Initial 2 second delay
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+      
+      // Add messages one by one with delays
+      welcomeMessages.forEach((msg, index) => {
+        setTimeout(() => {
+          setMessages(prev => [...prev, msg]);
+        }, index * 800); // 800ms between messages
+      });
+
+      // Enable input after all messages are shown
+      setTimeout(() => {
+        setIsLoading(false);
+      }, welcomeMessages.length * 800);
+    }, 2000); // Initial 2 second delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
   
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
