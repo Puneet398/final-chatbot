@@ -45,11 +45,20 @@ function App() {
     • National Biopharma Mission`
   };
 
- useEffect(() => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [conversationStage, setConversationStage] = useState(0);
+  const messagesEndRef = useRef(null);
+
+  // Initial loading sequence
+  useEffect(() => {
     const welcomeMessages = [
       { role: 'assistant', content: "Hey There ● I'm your Intelligent AI Copilot for India's Biomaterials sector" },
       { role: 'assistant', content: "I'm loaded with the latest 2024 market data" },
-      { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" }
+      { role: 'assistant', content: "India's biomaterials market is currently valued at $5.74B (projected $20.49B by 2032)" },
+      { role: 'assistant', content: "Type 'Ready' to begin your market entry strategy!" }
     ];
 
     // Initial 2 second delay
@@ -72,18 +81,6 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [conversationStage, setConversationStage] = useState(0);
-  const messagesEndRef = useRef(null);
-
-  // Simulate LLM thinking with random delays
-  const simulateThinking = async (min = 800, max = 1500) => {
-    const delay = Math.random() * (max - min) + min;
-    await new Promise(resolve => setTimeout(resolve, delay));
-  };
-
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -99,8 +96,9 @@ function App() {
     setIsLoading(true);
     
     try {
-      // Simulate AI thinking
-      await simulateThinking();
+      // Simulate AI thinking (500-1500ms random delay)
+      const delay = Math.random() * 1000 + 500;
+      await new Promise(resolve => setTimeout(resolve, delay));
       
       let response;
       
@@ -115,9 +113,6 @@ function App() {
         setConversationStage(1);
       } 
       else if (conversationStage === 1) {
-        // Simulate deeper analysis
-        await simulateThinking(1200, 2000);
-        
         const sector = getSectorFromInput(input);
         const sectorData = pdfContent.sectors[sector] || "";
         
@@ -131,18 +126,12 @@ function App() {
         setConversationStage(2);
       }
       else if (conversationStage === 2) {
-        // Simulate generating recommendations
-        await simulateThinking(1500, 2500);
-        
         response = { 
           content: generateRecommendations(input, pdfContent)
         };
         setConversationStage(3);
       }
       else {
-        // General Q&A mode with simulated thinking
-        await simulateThinking(1000, 3000);
-        
         const relevantContent = extractRelevantContent(input, pdfContent);
         response = { 
           content: relevantContent || "Based on general market trends, I recommend..."
@@ -166,7 +155,7 @@ function App() {
     if (/packag|consumer/i.test(input)) return 'packaging';
     if (/agricult|farm/i.test(input)) return 'agriculture';
     if (/textile|fashion/i.test(input)) return 'textiles';
-    return 'healthcare'; // default
+    return 'healthcare';
   };
 
   const generateRecommendations = (stage, data) => {
@@ -180,7 +169,6 @@ function App() {
     const keywords = query.toLowerCase().split(/\s+/);
     let relevantInfo = [];
     
-    // Search across all content sections
     Object.entries(data.sectors).forEach(([sector, content]) => {
       if (keywords.some(kw => content.toLowerCase().includes(kw))) {
         relevantInfo.push(`${sector.toUpperCase()}:\n${content}`);
@@ -195,64 +183,68 @@ function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>Chatbot</h1>
+        <h1>AI VC Assistant</h1>
+        <div className="subheader">India Biomaterials Market Intelligence</div>
       </div>
       
       <div className="chat-container">
-        <div className="chat-window">
-          {messages.map((msg, i) => (
-            <div key={i} className={`message ${msg.role}`}>
-              <div className="message-header">
-                {msg.role === 'user' ? (
-                  <span className="user-badge">You</span>
-                ) : (
-                  <span className="assistant-badge">AI Assistant</span>
-                )}
-              </div>
-              <div className="message-content">
-                {msg.role === 'user' ? (
-                  msg.content
-                ) : (
-                  <>
+        {isInitializing ? (
+          <div className="initial-loading">
+            <div className="loading-spinner"></div>
+            <p>Initializing AI Assistant...</p>
+          </div>
+        ) : (
+          <>
+            <div className="chat-window">
+              {messages.map((msg, i) => (
+                <div key={i} className={`message ${msg.role}`}>
+                  <div className="message-header">
+                    {msg.role === 'user' ? (
+                      <span className="user-badge">You</span>
+                    ) : (
+                      <span className="assistant-badge">AI Assistant</span>
+                    )}
+                  </div>
+                  <div className="message-content">
                     {msg.content.split('\n').map((line, idx) => (
                       <p key={idx}>{line}</p>
                     ))}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="message assistant">
-              <div className="message-content">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+                  </div>
                 </div>
-              </div>
+              ))}
+              {isLoading && (
+                <div className="message assistant">
+                  <div className="message-content">
+                    <div className="typing-indicator">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-        
-        <form onSubmit={handleSubmit} className="input-area">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isLoading}
-            placeholder={isLoading ? "AI Assistant is thinking..." : "Type your message..."}
-            autoFocus
-          />
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <span className="spinner"></span>
-            ) : (
-              <span>Send</span>
-            )}
-          </button>
-        </form>
+            
+            <form onSubmit={handleSubmit} className="input-area">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={isLoading}
+                placeholder={isLoading ? "AI Assistant is thinking..." : "Type your message..."}
+                autoFocus
+              />
+              <button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <span className="spinner"></span>
+                ) : (
+                  <span>Send</span>
+                )}
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );
